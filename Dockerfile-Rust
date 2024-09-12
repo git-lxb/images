@@ -1,0 +1,13 @@
+FROM ghcr.io/zhongwei/base:latest
+LABEL Name=Rust Version=0.1.0
+
+RUN set -ex && apt update && apt install -y libssl-dev pkg-config && \
+            apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+            . "$HOME/.cargo/env" && \
+            cargo install cargo-edit && \
+            cargo install sqlx-cli --no-default-features --features native-tls,sqlite,postgres && \
+            rm -rf ~/.cargo/registry && rm -rf ~/.cargo/git && \
+            sed -i '$d' /root/.config/nvim/lua/community.lua && \
+            echo -e '  { import = "astrocommunity.pack.rust" },\n  { import = "astrocommunity.pack.toml" },\n  { import = "astrocommunity.pack.wgsl" },\n}' >> /root/.config/nvim/lua/community.lua && \
+            nvim --headless +"Lazy! sync" +qall 

@@ -1,0 +1,25 @@
+FROM ghcr.io/zhongwei/base:latest
+LABEL Name=Rust Version=0.1.0
+
+RUN set -ex && sudo apt update && sudo apt install -y binutils-riscv64-linux-gnu cmake gcc-riscv64-unknown-elf gcc-riscv64-linux-gnu qemu-user qemu-user-static qemu-system-riscv64 gdb-multiarch && \
+            sudo apt clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+            sed -i '21i\  { import = "astrocommunity.pack.cmake" },' /root/.config/nvim/lua/community.lua && \
+            git clone https://github.com/mit-pdos/xv6-riscv.git && \
+            git clone https://github.com/plctlab/riscv-operating-system-mooc && \
+            git clone https://github.com/sunshaoce/rvcc && \
+            git clone https://github.com/rui314/chibicc && \
+            git clone https://github.com/DoctorWkt/acwj && \
+            git clone https://github.com/riba2534/TCP-IP-NetworkNote && \
+            git clone https://github.com/iEternity/TcpIpBook && \
+            git clone https://github.com/huaxz1986/APUE_notes && \
+            git clone https://github.com/brandongooch/apue.3e && \
+            git clone https://github.com/jschauma/cs631apue && \
+            git clone https://github.com/unpbook/unpv13e && \
+            git clone https://github.com/hailinzeng/Programming-POSIX-Threads && \
+            git clone https://github.com/mallius/unpv22e && \
+            git clone https://github.com/bradfa/tlpi-dist && \
+            git clone https://github.com/PacktPublishing/Hands-on-System-Programming-with-Linux && \
+            git clone https://github.com/raoulmillais/linux-system-programming && \
+            git clone https://github.com/yuan-xy/Linux-0.11 && \
+            git clone https://github.com/VOID001/neu-os && \
+            git clone https://github.com/stroxler/beginning_linux_programming

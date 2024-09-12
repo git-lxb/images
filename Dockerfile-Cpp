@@ -1,0 +1,25 @@
+FROM ghcr.io/zhongwei/base:latest
+LABEL Name=Cpp Version=0.1.0
+
+RUN set -ex && apt update && apt install -y clang cmake pkg-config && \
+            apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+            sed -i '21i\  { import = "astrocommunity.pack.cmake" },' /root/.config/nvim/lua/community.lua && \
+            nvim --headless +"Lazy! sync" +qall && \
+
+            GITHUB_REPO="https://api.github.com/repos" && \
+
+            # onnxruntime onnxruntime - ONNX Runtime is a cross-platform inference and training machine-learning accelerator.
+            ONNX_VERSION=$(curl -s "${GITHUB_REPO}/microsoft/onnxruntime/releases/latest" | grep -Po '"tag_name": "v\K[^"]*') && \
+            curl -Lo onnxruntime.tgz https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-linux-x64-${ONNX_VERSION}.tgz && \
+            tar xf onnxruntime.tgz -C /usr/local && rm onnxruntime.tgz && \
+
+            # OpenCV - Open Source Computer Vision Library
+            OPENCV_VERSION=$(curl -s "${GITHUB_REPO}/opencv/opencv/releases/latest" | grep -Po '(?<="tag_name": ")[^"]+') && \
+            curl -Lo opencv.tar.gz https://github.com/opencv/opencv/archive/refs/tags/${OPENCV_VERSION}.tar.gz && \
+            curl -Lo opencv_contrib.tar.gz https://github.com/opencv/opencv_contrib/archive/refs/tags/${OPENCV_VERSION}.tar.gz && \
+            tar xf opencv.tar.gz && tar xf opencv_contrib.tar.gz && mkdir -p build && cd build && \
+            # OpenCV as a static library (cmake options)
+            # cmake -DBUILD_SHARED_LIBS=OFF
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DBUILD_SHARED_LIBS=OFF -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-${OPENCV_VERSION}/modules ../opencv-${OPENCV_VERSION} && \
+            make -j2 && make install && cd /root && rm -rf opencv_contrib.tar.gz opencv.tar.gz opencv-4.10.0 opencv_contrib-4.10.0 build
+
